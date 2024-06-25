@@ -200,18 +200,7 @@
     align-items: center;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
-/* .background-layer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: -1;
-  background-image: url('{{ asset('images/school-image.jpg') }}');
-  background-size: cover;
-  background-position: center;
-  /* opacity: 0.5; adjust the transparency level 
-} */
+
 .background-layer {
   position: fixed;
   top: 81px; /* adjust to match the height of your navbar */
@@ -241,7 +230,6 @@
     </nav>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <aside class="col-md-3 bg-light sidebar" id="sidebar">
                 <div class="p-3">
                     <h4>DPS School</h4>
@@ -262,7 +250,6 @@
                 </div>
             </aside>
 
-            <!-- Main content area -->
             <main class="col-md-9">
                 <div class="container-form">
                     @yield("content")

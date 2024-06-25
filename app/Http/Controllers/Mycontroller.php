@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class Mycontroller extends Controller
@@ -64,7 +65,13 @@ class Mycontroller extends Controller
            'age'=>'required',
            'standard'=>'required',
            'division'=>'required',
-           'roll_no' => 'required|unique:students,roll_no',
+           'roll_no' => [
+        'required',
+        Rule::unique('students', 'roll_no')->where(function ($query) use ($request) {
+            return $query->where('standard', $request->standard)
+                         ->where('division', $request->division);
+        })
+    ],
            'subject.*' => 'required',
            'marks.*' => 'required'
         ]);
@@ -84,7 +91,7 @@ class Mycontroller extends Controller
     }
     public function editstudent($id){
         $data['students']= Mymodel::editstudent($id);
-        $data['subjects']=Mymodel::subjectsedit($id);
+        // $data['subjects']=Mymodel::subjectsedit($id);
         $data['standards']=Mymodel::student_form();
         // dd($data);
         return view('student.edit_student',$data);
@@ -113,5 +120,21 @@ class Mycontroller extends Controller
 
     // dd($data);
         return view('student.search_student',$data);
+}
+
+public function updatestudent(Request $request){
+    $data = Mymodel::updatestudent($request);
+    return response()->json(['message' => 'User registered successfully'], 200);
+}
+public function subject_store(Request $request){
+    // dd("hey");
+    $request->validate([
+        'student_id'=>'required',
+        'subject'=>'required',
+        'marks'=>'required'
+    ]);
+    $users = Mymodel::subject_store($request);
+    // dd($users);
+    return response()->json($users);
 }
 }

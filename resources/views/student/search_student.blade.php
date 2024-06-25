@@ -57,46 +57,6 @@
 
         @if (isset($students))
         <h4>Students in {{ $standard }} {{ $division }}:</h4>
-    
-        {{-- <table class="table container table-hover mt-2">
-            <thead>
-                <tr>
-                    <th scope="col">Sr No.</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Roll No</th>
-                    @foreach ($students->first()->subjects as $subject)
-                        <th scope="col">{{ $subject['subject'] }}</th>
-                    @endforeach
-                    <th scope="col">Total Marks</th>
-                    <th scope="col">Percentage:</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $totalMarks = 0;
-                @endphp
-                @foreach ($students as $student)
-                    @php
-                        $studentTotalMarks = 0;
-                        foreach ($student->subjects as $subject) {
-                            $studentTotalMarks += $subject['marks'];
-                        }
-                        $totalMarks += $studentTotalMarks;
-                    @endphp
-                    <tr>
-                        <td>{{ $loop->index + 1 }}</td>
-                        <td>{{ $student->name }}</td>
-                        <td>{{ $student->roll_no }}</td>
-                        @foreach ($student->subjects as $subject)
-                            <td>{{ $subject['marks'] }}</td>
-                        @endforeach
-                        <td>{{ $studentTotalMarks }}</td>
-                        <td>{{ number_format(($studentTotalMarks / 500) * 100, 2) }}%</td>
-                    </tr>
-                @endforeach
-               
-            </tbody>
-        </table> --}}
         @if (isset($students) && $students->count() > 0)
     
 
@@ -138,11 +98,6 @@
                         <td>{{ number_format(($studentTotalMarks / 500) * 100, 2) }}%</td>
                     </tr>
                 @endforeach
-                {{-- <tr>
-                    <td colspan="{{ count($students->first()->subjects) + 4 }}">Total:</td>
-                    <td>{{ $totalMarks }}</td>
-                    <td>{{ number_format(($totalMarks / (count($students) * 500)) * 100, 2) }}%</td>
-                </tr> --}}
             </tbody>
         </table>
         @else

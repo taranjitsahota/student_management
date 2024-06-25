@@ -52,7 +52,7 @@
             </div>
             <div class="col-12">
                 <div id="subjectList">
-                    <!-- Container for dynamically added subjects -->
+                    
                 </div>
             </div>
             <div class="col-12">
@@ -66,6 +66,57 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var addSubjectButton = document.getElementById('addSubject');
+            var subjectList = document.getElementById('subjectList');
+            var subjectIndex = 1;
+
+            addSubjectButton.addEventListener('click', function() {
+                var subjectCount = subjectList.children.length;
+                if (subjectCount < 5) {
+                var newSubjectInput = document.createElement('div');
+                newSubjectInput.classList.add('row', 'g-3', 'mb-3');
+                newSubjectInput.innerHTML = `
+              
+                <div class="col-md-4">
+                    <select id="subjectname" name="subject[${subjectIndex}][name]" class="form-control"">
+                        <option value="">Select Subject</option>
+                        <option value="Maths">Maths</option>
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Science">Science</option>
+                        <option value="Social Science">Social Science</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <input type="number" id="marks" name="subject[${subjectIndex}][marks]" class="form-control" placeholder="Marks" maxlength="3" onchange="changeHandler(this)">
+                </div>
+
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-danger removeSubject">Remove</button>
+                </div>
+            `;
+                subjectList.appendChild(newSubjectInput);
+                subjectIndex++;
+                if (subjectList.children.length >= 5) {
+                addSubjectButton.disabled = true;
+            }
+        }
+            });
+
+            subjectList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('removeSubject')) {
+                    event.target.closest('.row.g-3').remove();
+                }
+            });
+        });
+
+        function changeHandler(val) {
+            if (val.value < 0 || val.value > 100)
+                alert("Value should be between 0 - 100");
+            return;
+        }
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
@@ -84,14 +135,16 @@
                 var standard = $('#standard').val();
                 var division = $('#division').val();
                 var roll_no = $('#roll_no').val().trim();
+                // var marks = $('#marks').val().trim();
+                var subjectCount = $('#subjectList').children().length;
                 var errors = false;
 
-                if (name.length < 1 ) {
+                if (name.length < 1) {
                     $('#name-error').text('Name is required');
                     errors = true;
                 }
 
-                if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(name)){
+                if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(name)) {
                     $('#name-error').text('Name should not contain special characters');
                     errors = true;
                 }
@@ -106,7 +159,6 @@
                     errors = true;
                 }
 
-                // Validate Division
                 if (!division || division === "") {
                     $('#division-error').text('Division is required');
                     errors = true;
@@ -117,10 +169,19 @@
                     errors = true;
                 }
 
-                if ($('#subjectList').children().length < 1) {
-                    $('#addSubject-error').text('At least one subject is required');
+                // if ($('#subjectList').children().length) {
+                //     $('#addSubject-error').text('At least one subject is required');
+                //     errors = true;
+                // }
+
+                if (subjectCount !== 0 && subjectCount < 5) {
+                    $('#addSubject-error').text('Either no subjects or at least 5 subjects are required');
                     errors = true;
                 }
+
+
+               
+            
 
                 if (errors) {
                     return;
@@ -137,18 +198,7 @@
                     success: function(response) {
                         // alert('data inserted');
                         window.location = "{{ route('studentdata') }}"
-                        // $('#name').val('');
-                        // $('#registeremail').val('');
-                        // $('#registerpassword').val('');
-                        // $('#registration_success').text('Registration successful! Please login.');
-                        // // Transition to login form
-                        // $('#tab-1').prop('checked', true); // Activate the Login tab
-                        // $('.login').css('transform', 'rotateY(0)'); // Show the Login form
-                        // $('.sign-in').prop('checked',
-                        // true); // Ensure Sign-In radio button is selected
-
-                        // // Optionally, you can show a success message or perform other actions
-                        // console.log('Registration successful');
+                       
                     },
                     error: function(xhr, status, error) {
                         var errors = xhr.responseJSON.errors;
@@ -156,42 +206,11 @@
                             if (errors.roll_no) {
                                 $('#rollno-error').text(errors.roll_no[0]);
                             }
-                            // Handle other validation errors similarly
                         } else {
                             console.error('Error:', error);
                         }
                     }
                 });
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            var addSubjectButton = document.getElementById('addSubject');
-            var subjectList = document.getElementById('subjectList');
-            var subjectIndex = 1;
-
-            addSubjectButton.addEventListener('click', function() {
-                var newSubjectInput = document.createElement('div');
-                newSubjectInput.classList.add('row', 'g-3', 'mb-3');
-                newSubjectInput.innerHTML = `
-                <div class="col-md-4">
-                    <input type="text" name="subject[${subjectIndex}][name]" class="form-control" placeholder="Subject Name">
-                </div>
-                <div class="col-md-4">
-                    <input type="number" name="subject[${subjectIndex}][marks]" class="form-control" placeholder="Marks">
-                </div>
-                <div class="col-md-4">
-                    <button type="button" class="btn btn-danger removeSubject">Remove</button>
-                </div>
-            `;
-                subjectList.appendChild(newSubjectInput);
-                subjectIndex++;
-            });
-
-            // Event delegation to remove dynamically added subject inputs
-            subjectList.addEventListener('click', function(event) {
-                if (event.target.classList.contains('removeSubject')) {
-                    event.target.closest('.row.g-3').remove();
-                }
             });
         });
     </script>

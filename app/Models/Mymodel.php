@@ -30,7 +30,6 @@ class Mymodel extends Model
 
     public static function loginPost($request)
     {
-        // $email = session()->get('email');
         $email = $request->input('email');
         $password = $request->input('password');
 
@@ -59,33 +58,57 @@ class Mymodel extends Model
     }
     public static function storestudent($request)
     {
+        // dd($request);
+        $total = 0;
+        if ($request->subject) {
+
+            foreach ($request->subject as $key => $subject) {
+
+
+
+                if (isset($subject['marks'])) {
+                    $marks[] = $subject['marks'];
+                    $total += $subject['marks'];
+                }
+            }
+        }
+        // dd($total);
+        // $totalmarks = $request->subject->marks;
         $data = array(
             "name" => $request->name,
             "age" => $request->age,
             "standard" => $request->standard,
             "division" => $request->division,
             "roll_no" => $request->roll_no,
+            'total_marks' => $total
 
         );
         $subjects = [];
-        foreach ($request->subject as $subjectData) {
-            if (!empty($subjectData['name'])) {
-                $subjects[] = [
-                    'subjectname' => $subjectData['name'],
-                    'marks' => $subjectData['marks']
-                ];
-            }
-        }
-        $user = DB::table('students')
-            ->insertGetId($data);
-        if ($user) {
-            foreach ($subjects as $subject) {
-                $subject['student_id'] = $user;
-                DB::table('subjects')->insert($subject);
-            }
-            return 'Candidate registered!';
+        if (!$request->subject) {
+            $user = DB::table('students')
+                ->insert($data);
+            return $user;
         } else {
-            return 'Candidate not registered!';
+            foreach ($request->subject as $subjectData) {
+                if (!empty($subjectData['name'])) {
+                    $subjects[] = [
+                        'subjectname' => $subjectData['name'],
+                        'marks' => $subjectData['marks']
+                    ];
+                }
+            }
+            $user = DB::table('students')
+                ->insertGetId($data);
+            if ($user) {
+                foreach ($subjects as $subject) {
+                    $subject['student_id'] = $user;
+                    DB::table('subjects')
+                        ->insert($subject);
+                }
+                return 'Candidate registered!';
+            } else {
+                return 'Candidate not registered!';
+            }
         }
     }
     public static function studentdata()
@@ -93,11 +116,12 @@ class Mymodel extends Model
         $users = DB::table('students')
             ->select(
                 "students.*",
-                "subjects.subjectname as subject",
-                "subjects.marks as marks"
+                // "subjects.subjectname as subject",
+                // "subjects.marks as marks"
             )
-            ->Join('subjects', 'subjects.student_id', '=', 'students.id')
+            // ->Join('subjects', 'subjects.student_id', '=', 'students.id')
             ->whereNull('is_deleted')
+            ->orderBy('id', 'desc')
             ->get();
         // dd($users);
         return $users;
@@ -107,8 +131,17 @@ class Mymodel extends Model
         $users = DB::table('students')
             ->where('id', $id)
             ->first();
+        $data = DB::table('subjects')
+            ->where('student_id', $id)
+            ->get();
+        //    dd($users);
+        // dd($data);
+        return [
+            'students' => $users,
+            'subjects' => $data
+        ];
         //    dd($id);
-        return $users;
+        // return $users;
     }
     public static function subjectsedit($id)
     {
@@ -162,8 +195,85 @@ class Mymodel extends Model
                     })->all();
                     return $student;
                 });
-                // dd($data);
+            // dd($data);
         }
+        return $data;
+    }
+    public static function updatestudent($request)
+    {
+        // dd($request);
+            $user = DB::table('subjects')
+            ->where('id',$request->student_id)
+                ->delete();
+
+                $user = DB::table('students')
+            ->where('id',$request->student_id)
+                ->delete();
+            
+       // dd($request);
+       $total = 0;
+       if ($request->subject) {
+
+           foreach ($request->subject as $key => $subject) {
+
+
+
+               if (isset($subject['marks'])) {
+                   $marks[] = $subject['marks'];
+                   $total += $subject['marks'];
+               }
+           }
+       }
+       // dd($total);
+       // $totalmarks = $request->subject->marks;
+       $data = array(
+           "name" => $request->name,
+           "age" => $request->age,
+           "standard" => $request->standard,
+           "division" => $request->division,
+           "roll_no" => $request->roll_no,
+           'total_marks' => $total
+
+       );
+       $subjects = [];
+       if (!$request->subject) {
+           $user = DB::table('students')
+               ->insert($data);
+           return $user;
+       } else {
+           foreach ($request->subject as $subjectData) {
+               if (!empty($subjectData['name'])) {
+                   $subjects[] = [
+                       'subjectname' => $subjectData['name'],
+                       'marks' => $subjectData['marks']
+                   ];
+               }
+           }
+           $user = DB::table('students')
+               ->insertGetId($data);
+           if ($user) {
+               foreach ($subjects as $subject) {
+                   $subject['student_id'] = $user;
+                   DB::table('subjects')
+                       ->insert($subject);
+               }
+               return 'Candidate registered!';
+           } else {
+               return 'Candidate not registered!';
+           }
+       }
+    }
+    public static function subject_store($request)
+    {
+        // dd($request);
+        $data = [
+            'student_id' => $request->student_id,
+            'subjectname' => $request->subject,
+            'marks' => $request->marks
+        ];
+        $users = DB::table('subjects')
+            ->insert($data);
+        // dd($data);
         return $data;
     }
 }
