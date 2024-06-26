@@ -13,6 +13,7 @@ Route::post("/loginpost",[Mycontroller::class,"loginPost"])->name("login.post");
 Route::get('/logout',[Mycontroller::class,"logout"]);
 Route::get("/student_form",[Mycontroller::class,"studentform"]);
 Route::get("/student_data",[Mycontroller::class,"studendata"])->name("studentdata");
+Route::get("/subject_data{id}",[Mycontroller::class,"subjectdata"])->name("subjectdata");
 Route::post("/storestudent",[Mycontroller::class,"storestudent"])->name("storestudent");
 Route::get("/editstudent/{id}",[Mycontroller::class,"editstudent"])->name("editstudent");
 Route::post("/updatestudent",[Mycontroller::class,"updatestudent"])->name("updatestudent");

@@ -52,7 +52,7 @@
             </div>
             <div class="col-12">
                 <div id="subjectList">
-                    
+
                 </div>
             </div>
             <div class="col-12">
@@ -74,9 +74,9 @@
             addSubjectButton.addEventListener('click', function() {
                 var subjectCount = subjectList.children.length;
                 if (subjectCount < 5) {
-                var newSubjectInput = document.createElement('div');
-                newSubjectInput.classList.add('row', 'g-3', 'mb-3');
-                newSubjectInput.innerHTML = `
+                    var newSubjectInput = document.createElement('div');
+                    newSubjectInput.classList.add('row', 'g-3', 'mb-3');
+                    newSubjectInput.innerHTML = `
               
                 <div class="col-md-4">
                     <select id="subjectname" name="subject[${subjectIndex}][name]" class="form-control"">
@@ -87,22 +87,26 @@
                         <option value="Science">Science</option>
                         <option value="Social Science">Social Science</option>
                     </select>
+            <span class="error-message" id="subject-error"></span>
+
                 </div>
 
                 <div class="col-md-4">
                     <input type="number" id="marks" name="subject[${subjectIndex}][marks]" class="form-control" placeholder="Marks" maxlength="3" onchange="changeHandler(this)">
+            <span class="error-message" id="marks-error"></span>
+
                 </div>
 
                 <div class="col-md-4">
                     <button type="button" class="btn btn-danger removeSubject">Remove</button>
                 </div>
             `;
-                subjectList.appendChild(newSubjectInput);
-                subjectIndex++;
-                if (subjectList.children.length >= 5) {
-                addSubjectButton.disabled = true;
-            }
-        }
+                    subjectList.appendChild(newSubjectInput);
+                    subjectIndex++;
+                    if (subjectList.children.length >= 5) {
+                        addSubjectButton.disabled = true;
+                    }
+                }
             });
 
             subjectList.addEventListener('click', function(event) {
@@ -114,8 +118,9 @@
 
         function changeHandler(val) {
             if (val.value < 0 || val.value > 100)
-                alert("Value should be between 0 - 100");
-            return;
+                $('#marks-error').text('Value should be between 0 to 100');
+            // errors true;
+            return false;
         }
         $(document).ready(function() {
             $.ajaxSetup({
@@ -135,7 +140,8 @@
                 var standard = $('#standard').val();
                 var division = $('#division').val();
                 var roll_no = $('#roll_no').val().trim();
-                // var marks = $('#marks').val().trim();
+                var subject = $('#subjectname').val().trim();
+                var marks = $('#marks').val().trim();
                 var subjectCount = $('#subjectList').children().length;
                 var errors = false;
 
@@ -179,9 +185,44 @@
                     errors = true;
                 }
 
+                if (subject.length < 1) {
+                    $('#subject-error').text('Select subject');
+                    errors = true;
+                }
 
-               
-            
+                if (marks.length < 1) {
+                    $('#marks-error').text('Enter Marks');
+                    errors = true;
+                }
+
+                var subjectsValid = true;
+        $('#subjectList').find('.row.g-3').each(function(index, subjectRow, marksRow) {
+            var subjectName = $(subjectRow).find('select[name^="subject["]').val().trim();
+            var marks = $(marksRow).find('input[name^="subject["]').val().trim();
+
+            if (subjectName.length < 1) {
+                subjectsValid = false;
+                $(subjectRow).find('.error-message').text('Select subject');
+            }
+
+            if (marks.length < 1) {
+                subjectsValid = false;
+                $(marksRow).find('.error-message').text('Enter Marks');
+            }
+            if (marks > 100) {
+                subjectsValid = false;
+                $(marksRow).find('.error-message').text('Marks not more than 100');
+            }
+        });
+
+        if (!subjectsValid) {
+            errors = true;
+        }
+
+        if (errors) {
+            return;
+        }
+
 
                 if (errors) {
                     return;
@@ -198,13 +239,21 @@
                     success: function(response) {
                         // alert('data inserted');
                         window.location = "{{ route('studentdata') }}"
-                       
+
                     },
                     error: function(xhr, status, error) {
                         var errors = xhr.responseJSON.errors;
-                        if (errors) {
-                            if (errors.roll_no) {
-                                $('#rollno-error').text(errors.roll_no[0]);
+                        // if (errors) {
+                        //     if (errors.false) {
+                        //         $('#rollno-error').text(errors.roll_no[0]);
+                        //     }
+                        // } else {
+                        //     console.error('Error:', error);
+                        // }
+                        if (xhr.status == 422) {
+                            var errors = xhr.responseJSON;
+                            if (errors && errors.error) {
+                                $('#rollno-error').text(errors.error);
                             }
                         } else {
                             console.error('Error:', error);

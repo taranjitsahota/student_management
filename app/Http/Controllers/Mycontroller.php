@@ -65,13 +65,13 @@ class Mycontroller extends Controller
            'age'=>'required',
            'standard'=>'required',
            'division'=>'required',
-           'roll_no' => [
-        'required',
-        Rule::unique('students', 'roll_no')->where(function ($query) use ($request) {
-            return $query->where('standard', $request->standard)
-                         ->where('division', $request->division);
-        })
-    ],
+    //        'roll_no' => [
+    //     'required',
+    //     Rule::unique('students', 'roll_no')->where(function ($query) use ($request) {
+    //         return $query->where('standard', $request->standard)
+    //                      ->where('division', $request->division);
+    //     })
+    // ],
            'subject.*' => 'required',
            'marks.*' => 'required'
         ]);
@@ -89,6 +89,11 @@ class Mycontroller extends Controller
         // dd($data);
         return view('student.student_data',$data);
     }
+    public function subjectdata($id){
+    $data['subjects'] = Mymodel::subjectdata($id);
+    // dd($data);
+    return $data;
+    }
     public function editstudent($id){
         $data['students']= Mymodel::editstudent($id);
         // $data['subjects']=Mymodel::subjectsedit($id);
@@ -102,9 +107,10 @@ class Mycontroller extends Controller
         return back();
     }
     public function searchstudent(){
-        // $data['students'] = Mymodel::searchstudent();
+        // $data['standards'] = Mymodel::searchstudent();
+        $data['standards']=Mymodel::student_form();
         // dd($data);
-        return view('student.search_student');
+        return view('student.search_student',$data);
     }
     public function viewStudents(Request $request)
 {

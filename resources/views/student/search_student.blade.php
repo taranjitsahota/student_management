@@ -35,9 +35,12 @@
                 <label for="standard" class="form-label">Select Standard:</label>
                 <select name="standard" id="standard" class="form-select">
                     <option value="">Select Standard</option>
-                    @foreach (range(1, 12) as $std)
+                    {{-- @foreach (range(1, 12) as $std)
                         <option value="{{ $std }}">{{ $std }}th</option>
-                    @endforeach
+                    @endforeach --}}
+                    @foreach ($standards as $standard)
+                    <option value="{{ $standard->id }}">{{ $standard->standard }}</option>
+                @endforeach
                 </select>
             </div>
 

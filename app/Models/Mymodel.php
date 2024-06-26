@@ -58,7 +58,25 @@ class Mymodel extends Model
     }
     public static function storestudent($request)
     {
-        // dd($request);
+        // dd($request->roll_no);
+        $roll = DB::table('students')
+        ->select(
+            'roll_no',
+            'standard',
+            'division'   
+        )
+        ->where('standard',$request->standard)
+        ->where('division',$request->division)
+
+        ->get();
+        // dd($roll[1]->roll_no);
+        foreach($roll as $roll_no){
+            $number = $roll_no->roll_no;
+            if($request->roll_no == $number){
+                // dd($number);
+                return false;
+            }
+        }
         $total = 0;
         if ($request->subject) {
 
@@ -125,6 +143,14 @@ class Mymodel extends Model
             ->get();
         // dd($users);
         return $users;
+    }
+    public static function subjectdata($id){
+        // dd($id);
+        $data = DB::table('subjects')
+        ->where('student_id',$id)
+                ->get();
+                // dd($data);
+                return $data;
     }
     public static function editstudent($id)
     {
