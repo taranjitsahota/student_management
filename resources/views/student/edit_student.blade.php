@@ -11,12 +11,6 @@
             padding: 5px;
         }
     </style>
-    {{-- @php
-        dd($students);
-    @endphp --}}
-    {{-- @php
-        dd($standards);
-    @endphp --}}
     <div class="container-form">
         <h3>Edit Form</h3>
         <div>
